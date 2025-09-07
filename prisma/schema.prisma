@@ -8,53 +8,50 @@ datasource db {
 }
 
 model User {
-  id           BigInt      @id @default(autoincrement())
-  telegramId   String      @unique
-  username     String?
-  balanceStars BigInt      @default(0) // баланс в звёздах
-  balanceCoins BigInt      @default(0) // Mines Coins
-  pickaxeLevel Int         @default(0)
-  lastMineAt   DateTime?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  transactions Transaction[]
-  inventory    Inventory[]
-  referrals    Referral[]  @relation("referrer")
-  caseOpens    CaseOpen[]
-}
-
-model Transaction {
-  id        BigInt   @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    BigInt
-  type      String
-  amount    BigInt
-  meta      Json?
-  createdAt DateTime @default(now())
-}
-
-model Inventory {
-  id       BigInt @id @default(autoincrement())
-  user     User   @relation(fields: [userId], references: [id])
-  userId   BigInt
-  resource String
-  amount   Int     @default(0)
+  id               String         @id @default(cuid())
+  telegramId       BigInt         @unique
+  username         String?
+  createdAt        DateTime       @default(now())
+  lastMineAt       DateTime?
+  lastFreeCaseAt   DateTime?
+  pickaxeLevel     Int            @default(0)
+  minesCoin        BigInt         @default(0)
+  starsBalance     BigInt         @default(0)
+  referrerId       String?
+  referrals        Referral[]
+  transactions     Transaction[]
+  inventory        UserResource[]
 }
 
 model Referral {
-  id             BigInt  @id @default(autoincrement())
-  referrer       User    @relation("referrer", fields: [referrerId], references: [id])
-  referrerId     BigInt
-  referredUserId BigInt
-  percent        Float   @default(0.05)
-  createdAt      DateTime @default(now())
+  id         String  @id @default(cuid())
+  userId     String  @unique
+  referredBy String?
 }
 
-model CaseOpen {
-  id        BigInt   @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    BigInt
-  caseType  Int
-  reward    Json
+model Transaction {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    BigInt
+  type      String
   createdAt DateTime @default(now())
+  meta      String?
+}
+
+model WithdrawalRequest {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    BigInt
+  fee       Int
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+}
+
+model UserResource {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  resource  String
+  amount    BigInt   @default(0)
+  @@unique([userId, resource])
 }
