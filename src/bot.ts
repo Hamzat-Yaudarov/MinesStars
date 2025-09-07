@@ -235,7 +235,7 @@ bot.callbackQuery(/action:(.+)/, async (ctx) => {
 
     case "profile": {
       const u = await prisma.user.findUnique({ where: { id: user.id }, include: { inventory: true } });
-      const invSummary = u!.inventory.map(i => `${humanize(i.resource)}: ${i.amount}`).join("\n") || "пусто";
+      const invSummary = u!.inventory.map((i: any) => `${humanize(i.resource)}: ${i.amount}`).join("\n") || "пусто";
       const referralsCount = await prisma.user.count({ where: { referrerId: u!.id } });
       const refEarnAgg = await prisma.transaction.aggregate({ where: { userId: u!.id, type: "ref_bonus" }, _sum: { amount: true } });
       const refEarned = (refEarnAgg._sum.amount) ? Number(refEarnAgg._sum.amount) : 0;
@@ -250,7 +250,7 @@ bot.callbackQuery(/action:(.+)/, async (ctx) => {
 
     case "inventory": {
       const u = await prisma.user.findUnique({ where: { id: user.id }, include: { inventory: true } });
-      const invLines = u!.inventory.map(i => `${humanize(i.resource)}: ${i.amount}`).join("\n") || "пусто";
+      const invLines = u!.inventory.map((i: any) => `${humanize(i.resource)}: ${i.amount}`).join("\n") || "пусто";
       await ctx.api.sendMessage(ctx.chat!.id, `Инвентарь:\n${invLines}`, { reply_markup: mainMenuKeyboard() });
       break;
     }
@@ -295,7 +295,7 @@ bot.callbackQuery(/action:(.+)/, async (ctx) => {
       ladderGames.set(user.id, state);
       // persist to DB (one active per user)
       try {
-        await prisma.activeGame.create({ data: { userId: user.id, bet: BigInt(amount), level: 1, broken: JSON.parse(JSON.stringify(broken.map(s=>Array.from(s)))), messageId: state.messageId, chatId: state.chatId, startedAt: new Date(state.startedAt) } });
+        await prisma.activeGame.create({ data: { userId: user.id, bet: BigInt(amount), level: 1, broken: JSON.parse(JSON.stringify(broken.map((s:any)=>Array.from(s)))), messageId: state.messageId, chatId: state.chatId, startedAt: new Date(state.startedAt) } });
       } catch (e) {
         // ignore create errors
       }
@@ -354,7 +354,7 @@ bot.callbackQuery(/action:(.+)/, async (ctx) => {
         else await ctx.api.sendMessage(ctx.chat!.id, text, { reply_markup: kb });
         // persist updated level to DB
         try {
-          await prisma.activeGame.updateMany({ where: { userId: state.userId } as any, data: { level: state.level, broken: JSON.parse(JSON.stringify(state.broken.map(s=>Array.from(s)))) } as any });
+          await prisma.activeGame.updateMany({ where: { userId: state.userId } as any, data: { level: state.level, broken: JSON.parse(JSON.stringify(state.broken.map((s:any)=>Array.from(s)))) } as any });
         } catch (e) {}
         // schedule next-level timeout (safe)
         scheduleLadderExpireSafe(user.id);
@@ -403,7 +403,7 @@ bot.callbackQuery(/action:(.+)/, async (ctx) => {
       const now = new Date();
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const deposits = await prisma.transaction.findMany({ where: { userId: user.id, type: "deposit", createdAt: { gte: startOfDay } } });
-      const totalDepositedToday = deposits.reduce((s, d) => s + Number(d.amount), 0);
+      const totalDepositedToday = deposits.reduce((s: number, d: any) => s + Number(d.amount), 0);
       if (totalDepositedToday < 200) return ctx.api.sendMessage(ctx.chat!.id, "Для получения бесплатного кейса нужно пополнить баланс на 200 звёзд сегодня.");
       if (user.lastFreeCaseAt) {
         const last = user.lastFreeCaseAt;

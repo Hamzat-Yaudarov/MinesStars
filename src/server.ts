@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import bot, { setWebhook, loadActiveGames } from "./bot.js";
-import { PORT } from "./config.js";
+import { PORT, ADMIN_ID } from "./config.js";
 
 const app = express();
 app.use(bodyParser.json());
@@ -36,7 +36,7 @@ app.get("/admin/transactions", async (req, res) => {
 
 app.post("/webhook", async (req, res) => {
   try {
-    await bot.handleUpdate(req.body, res);
+    await bot.handleUpdate(req.body as any, res as any);
   } catch (err) {
     console.error(err);
     res.sendStatus(500);
