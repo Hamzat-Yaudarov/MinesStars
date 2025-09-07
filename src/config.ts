@@ -6,3 +6,4 @@ export const DATABASE_URL = process.env.DATABASE_URL || process.env.NEON_URL || 
 export const WEBHOOK_URL = process.env.WEBHOOK_URL || "";
 export const ADMIN_ID = process.env.ADMIN_ID || "";
 export const PORT = Number(process.env.PORT || 3000);
+export const BOT_USERNAME = process.env.BOT_USERNAME || "tickpiarrobot";

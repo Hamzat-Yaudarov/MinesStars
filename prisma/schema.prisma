@@ -18,6 +18,7 @@ model User {
   minesCoin        BigInt         @default(0)
   starsBalance     BigInt         @default(0)
   referrerId       String?
+  referralCode     String?        @unique
   referrals        Referral[]
   transactions     Transaction[]
   inventory        UserResource[]
@@ -54,4 +55,16 @@ model UserResource {
   resource  String
   amount    BigInt   @default(0)
   @@unique([userId, resource])
+}
+
+model ActiveGame {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  bet       BigInt
+  level     Int
+  broken    Json
+  messageId Int?
+  chatId    Int?
+  startedAt DateTime @default(now())
+  locked    Boolean  @default(false)
 }
