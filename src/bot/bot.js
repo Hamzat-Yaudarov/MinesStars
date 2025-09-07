@@ -18,7 +18,24 @@ async function ensureUser(ctx) {
   return user;
 }
 
+function createStubBot() {
+  console.warn('Создан stub-бот: BOT_TOKEN отсутствует. Стандартные команды недоступны.');
+  return {
+    handleUpdate: async () => {},
+    telegram: {
+      async setWebhook() { console.warn('setWebhook called on stub bot'); }
+    },
+    on() {},
+    command() {},
+    start() {},
+  };
+}
+
 function createBot() {
+  if (config.MISSING_BOT_TOKEN) {
+    return createStubBot();
+  }
+
   const bot = new Telegraf(config.BOT_TOKEN);
 
   bot.start(async (ctx) => {
