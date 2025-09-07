@@ -1,18 +1,17 @@
 {
-  "name": "mines-stars",
-  "version": "1.0.0",
+  "name": "mines-stars-bot",
+  "version": "0.1.0",
   "private": true,
-  "main": "src/server.js",
+  "main": "src/server/run.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node src/server.js"
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push --preview-feature",
+    "start": "node src/server/run.js"
   },
   "dependencies": {
-    "@prisma/client": "^6.15.0",
-    "prisma": "^6.15.0",
+    "@prisma/client": "^5.0.0",
     "express": "^4.18.2",
-    "axios": "^1.4.0",
-    "dotenv": "^16.0.3",
-    "cors": "^2.8.5"
+    "prisma": "^5.0.0",
+    "telegraf": "^4.12.2"
   }
 }

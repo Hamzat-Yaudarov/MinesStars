@@ -4,81 +4,57 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("NEON_URL")
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  telegramId    String    @unique
-  username      String?
-  balanceStars  Float     @default(0)
-  balanceCoins  Float     @default(0)
-  pickaxeLevel  Int       @default(0)
-  referrerId    Int?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  referrals     User[]    @relation("Referrals")
-  referrer      User?     @relation("Referrals", fields: [referrerId], references: [id])
-  MineLogs      MineLog[]
-  Transactions  Transaction[]
-  Withdrawals   Withdrawal[]
-}
-
-model PickaxeLevel {
-  id             Int      @id @default(autoincrement())
-  level          Int      @unique
-  cost           Int
-  coalMin        Int
-  coalMax        Int
-  copperMin      Int
-  copperMax      Int
-  ironMin        Int
-  ironMax        Int
-  goldMin        Int
-  goldMax        Int
-  diamondMin     Int
-  diamondMax     Int
-  chanceMultiplier Json
-  createdAt      DateTime @default(now())
-}
-
-model Case {
-  id         Int      @id @default(autoincrement())
-  externalId String   @unique
-  name       String
-  costStars  Int
-  meta       Json?
-  createdAt  DateTime @default(now())
-}
-
-model MineLog {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
-  resource  String
-  amount    Int
-  coinValue Int
-  createdAt DateTime @default(now())
+  id           BigInt      @id @default(autoincrement())
+  telegramId   String      @unique
+  username     String?
+  balanceStars BigInt      @default(0) // баланс в звёздах
+  balanceCoins BigInt      @default(0) // Mines Coins
+  pickaxeLevel Int         @default(0)
+  lastMineAt   DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  transactions Transaction[]
+  inventory    Inventory[]
+  referrals    Referral[]  @relation("referrer")
+  caseOpens    CaseOpen[]
 }
 
 model Transaction {
-  id          Int      @id @default(autoincrement())
-  user        User     @relation(fields: [userId], references: [id])
-  userId      Int
-  type        String
-  deltaStars  Float
-  balanceAfter Float
-  meta        Json?
-  createdAt   DateTime @default(now())
+  id        BigInt   @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    BigInt
+  type      String
+  amount    BigInt
+  meta      Json?
+  createdAt DateTime @default(now())
 }
 
-model Withdrawal {
-  id            Int      @id @default(autoincrement())
-  user          User     @relation(fields: [userId], references: [id])
-  userId        Int
-  amountStars   Int
-  feeStars      Int
-  status        String   @default("pending")
-  createdAt     DateTime @default(now())
-  processedAt   DateTime?
+model Inventory {
+  id       BigInt @id @default(autoincrement())
+  user     User   @relation(fields: [userId], references: [id])
+  userId   BigInt
+  resource String
+  amount   Int     @default(0)
+}
+
+model Referral {
+  id             BigInt  @id @default(autoincrement())
+  referrer       User    @relation("referrer", fields: [referrerId], references: [id])
+  referrerId     BigInt
+  referredUserId BigInt
+  percent        Float   @default(0.05)
+  createdAt      DateTime @default(now())
+}
+
+model CaseOpen {
+  id        BigInt   @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    BigInt
+  caseType  Int
+  reward    Json
+  createdAt DateTime @default(now())
 }
